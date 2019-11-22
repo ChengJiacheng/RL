@@ -12,7 +12,6 @@ get_ipython().system('nvidia-smi')
 
 
 
-
 import warnings ; warnings.filterwarnings('ignore')
 import os
 
@@ -470,16 +469,17 @@ for seed in SEEDS:
     }
     
     value_model_fn = lambda nS, nA: FCQ(nS, nA, hidden_dims=(512,128))
-    # value_optimizer_fn = lambda net, lr: optim.Adam(net.parameters(), lr=lr)
-    value_optimizer_fn = lambda net, lr: optim.RMSprop(net.parameters(), lr=lr)
+    value_optimizer_fn = lambda net, lr: optim.Adam(net.parameters(), lr=lr)
+#    value_optimizer_fn = lambda net, lr: optim.RMSprop(net.parameters(), lr=lr)
+#    value_optimizer_fn = lambda net, lr: optim.SGD(net.parameters(), lr=1e0*lr, momentum=0.9)
     value_optimizer_lr = 0.0005
 
-    training_strategy_fn = lambda: EGreedyStrategy(epsilon=0.5)
+    training_strategy_fn = lambda: EGreedyStrategy(epsilon=0.3)
     # evaluation_strategy_fn = lambda: EGreedyStrategy(epsilon=0.05)
     evaluation_strategy_fn = lambda: GreedyStrategy()
 
-    batch_size = 1024
-    epochs = 2
+    batch_size = 256
+    epochs = 10
 
     env_name, gamma, max_minutes, max_episodes, goal_mean_100_reward = environment_settings.values()
     agent = NFQ(value_model_fn, 
