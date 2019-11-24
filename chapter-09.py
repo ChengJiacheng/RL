@@ -582,11 +582,8 @@ class DQN():
                 mean_100_reward, std_100_reward, mean_100_exp_rat, std_100_exp_rat,
                 mean_100_eval_score, std_100_eval_score)
             
-            if (episode-1)%25 == 0:
+            if (episode-1)%25 == 0 or training_is_over:
                 print(episode, debug_message, end='\n')
-#            sys.stdout.flush()
-#            sys.stdout.write(debug_message)
-#            sys.stdout.flush()
 
             
 #            if reached_debug_time or training_is_over:
@@ -636,28 +633,28 @@ dqn_agents, best_dqn_agent_key, best_eval_score = {}, None, float('-inf')
 
 environment_settings = {
     'env_name': 'CartPole-v1',
-    'gamma': 1.00,
+    'gamma': 1,
     'max_minutes': 20,
     'max_episodes': 10000,
     'goal_mean_100_reward': 350
 }
 
 value_model_fn = lambda nS, nA: FCQ(nS, nA, hidden_dims=(512, 128))
-#    value_optimizer_fn = lambda net, lr: optim.RMSprop(net.parameters(), lr=lr)
+#value_optimizer_fn = lambda net, lr: optim.RMSprop(net.parameters(), lr=lr)
 value_optimizer_fn = lambda net, lr: optim.Adam(net.parameters(), lr=lr)
 value_optimizer_lr = 0.0005
 
-training_strategy_fn = lambda: EGreedyStrategy(epsilon=0.2)
+# training_strategy_fn = lambda: EGreedyStrategy(epsilon=0.7)
 # training_strategy_fn = lambda: EGreedyLinearStrategy(init_epsilon=1.0,
-#                                                      min_epsilon=0.3,
-#                                                      max_steps=20000)
+#                                                       min_epsilon=0.2,
+#                                                       decay_steps=20000)
 # training_strategy_fn = lambda: SoftMaxStrategy(init_temp=1.0,
 #                                                min_temp=0.1,
 #                                                exploration_ratio=0.8,
-#                                                max_steps=20000)
-# training_strategy_fn = lambda: EGreedyExpStrategy(init_epsilon=1.0,
-#                                                   min_epsilon=0.3,
-#                                                   decay_steps=20000)
+#                                                decay_steps=20000)
+training_strategy_fn = lambda: EGreedyExpStrategy(init_epsilon=1.0,
+                                                  min_epsilon=0.3,
+                                                  decay_steps=20000)
 evaluation_strategy_fn = lambda: GreedyStrategy()
 
 replay_buffer_fn = lambda: ReplayBuffer(max_size=10000, batch_size=64)
@@ -866,8 +863,6 @@ print(np.mean(he(0)))
 #plt.title('Huber Loss')
 #plt.legend([plot1,plot2],["Huber, δ=30", "Huber, δ=10"])
 #plt.show()
-
-
 
 plt.figure()
 # plot1, = plt.plot(pred, se, ':')
